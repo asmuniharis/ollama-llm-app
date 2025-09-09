@@ -1,0 +1,175 @@
+<!-- <mat-card style="max-width: 600px; margin: 20px auto">
+  <mat-card-header>
+    <mat-card-title>💬 Chat Component</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p>Chat functionality will be implemented here!</p>
+    <p>Status: <span style="color: green">✅ Component Loaded</span></p>
+  </mat-card-content>
+</mat-card> -->
+<!-- src/app/components/chat/chat.component.html -->
+<div class="chat-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <h2>💬 Ollama LLM Chat</h2>
+    <div class="connection-status">
+      <span [class]="isConnected ? 'connected' : 'disconnected'">
+        {{ isConnected ? "🟢 Connected" : "🔴 Disconnected" }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Model Selection -->
+  <mat-card class="model-selection">
+    <mat-card-content>
+      <div class="model-controls">
+        <mat-form-field appearance="outline" class="model-select">
+          <mat-label>Select Model</mat-label>
+          <mat-select [(value)]="selectedModel">
+            <mat-option
+              *ngFor="let model of availableModels"
+              [value]="model.name"
+            >
+              {{ model.name }} ({{ model.size }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="loadAvailableModels()"
+          [disabled]="isLoading"
+        >
+          🔄 Refresh
+        </button>
+
+        <button
+          mat-raised-button
+          color="warn"
+          (click)="pullModel()"
+          [disabled]="isLoading"
+        >
+          📥 Download Model
+        </button>
+      </div>
+
+      <!-- Advanced Options -->
+      <div class="advanced-options" [formGroup]="chatForm">
+        <mat-form-field appearance="outline" class="option-field">
+          <mat-label>Temperature</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="temperature"
+            min="0"
+            max="2"
+            step="0.1"
+          />
+          <mat-hint>Controls randomness (0.0 - 2.0)</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="option-field">
+          <mat-label>Max Tokens</mat-label>
+          <input
+            matInput
+            type="number"
+            formControlName="maxTokens"
+            min="1"
+            max="4000"
+            step="100"
+          />
+          <mat-hint>Maximum response length</mat-hint>
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Messages Container -->
+  <div class="messages-container" #messagesContainer>
+    <div class="messages-list">
+      <div
+        *ngFor="let message of messages"
+        [class]="'message ' + (message.isUser ? 'user-message' : 'bot-message')"
+      >
+        <div class="message-content">
+          <div class="message-header">
+            <span class="sender">
+              {{
+                message.isUser
+                  ? "👤 You"
+                  : "🤖 " + (message.model || "Assistant")
+              }}
+            </span>
+            <span class="timestamp">
+              {{ message.timestamp | date : "HH:mm:ss" }}
+            </span>
+          </div>
+
+          <div class="message-text" [innerHTML]="message.content | nl2br"></div>
+        </div>
+      </div>
+
+      <!-- Loading indicator -->
+      <div *ngIf="isLoading" class="message bot-message loading-message">
+        <div class="message-content">
+          <div class="message-header">
+            <span class="sender">🤖 {{ selectedModel }}</span>
+          </div>
+          <div class="loading-indicator">
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Thinking...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="input-container">
+    <mat-card>
+      <mat-card-content>
+        <form
+          [formGroup]="chatForm"
+          (ngSubmit)="sendMessage()"
+          class="chat-form"
+        >
+          <mat-form-field appearance="outline" class="message-input">
+            <mat-label>Type your message...</mat-label>
+            <textarea
+              matInput
+              formControlName="message"
+              (keydown)="onKeyPress($event)"
+              rows="3"
+              placeholder="Ask anything..."
+            ></textarea>
+            <mat-error *ngIf="chatForm.get('message')?.hasError('required')">
+              Message is required
+            </mat-error>
+          </mat-form-field>
+
+          <div class="input-actions">
+            <button
+              mat-raised-button
+              color="warn"
+              type="button"
+              (click)="clearChat()"
+              [disabled]="isLoading || messages.length === 0"
+            >
+              🗑️ Clear
+            </button>
+
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="!chatForm.valid || isLoading || !isConnected"
+            >
+              🚀 Send
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

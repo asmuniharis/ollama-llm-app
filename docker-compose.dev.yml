@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  # Development Ollama
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-dev
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_dev_data:/root/.ollama
+      - ./models:/models
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_DEBUG=1
+    networks:
+      - dev-network
+
+  # PostgreSQL for development (optional)
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-dev
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=ollama_app_dev
+      - POSTGRES_USER=dev_user
+      - POSTGRES_PASSWORD=dev_password
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - dev-network
+
+volumes:
+  ollama_dev_data:
+  postgres_dev_data:
+
+networks:
+  dev-network:
+    driver: bridge

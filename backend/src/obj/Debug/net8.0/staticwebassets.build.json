@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "sfBBrvhDx2EIg/5d4zYFKxxO+7oF95umw1WrN22gl6A=",
+  "Source": "OllamaLlmApp.Backend",
+  "BasePath": "_content/OllamaLlmApp.Backend",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

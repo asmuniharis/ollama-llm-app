@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\OllamaLlmApp.Backend.props" />
+</Project>
